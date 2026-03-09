@@ -12,7 +12,10 @@ jobs:
         with:
           fetch-depth: 0
           lfs: true
-      - name: Push to hub
+      - name: Force push backend folder to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://Shrizz999:$HF_TOKEN@huggingface.co/spaces/Shrizz999/shrizzfolio main
+        run: |
+          # Isolate the backend folder into its own commit and force push it
+          COMMIT=$(git subtree split --prefix backend HEAD)
+          git push --force https://Shrizz999:$HF_TOKEN@huggingface.co/spaces/Shrizz999/shrizzfolio $COMMIT:main
