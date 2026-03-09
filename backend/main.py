@@ -12,12 +12,14 @@ from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
+import ml_routes
 
 # Load the hidden .env file (Does nothing in production on Render, which is perfect)
 load_dotenv()
 
 # Initialize FastAPI App
 app = FastAPI(title="Portfolio ML Engine")
+app.include_router(ml_routes.router, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
