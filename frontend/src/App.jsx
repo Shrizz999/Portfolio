@@ -105,7 +105,6 @@ function AIAgentSection() {
     setIsLoading(true);
 
     try {
-      // Switched to HTTPS to prevent mixed-content blocks on Vercel
       const response = await fetch('https://portfolio-myax.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -181,6 +180,12 @@ function OpenCVSection() {
   const [cvMode, setCvMode] = useState('canny'); 
   const wsRef = useRef(null);
 
+  // ======================================================================
+  // EDIT THE LINE BELOW! Replace the string with your Hugging Face Domain
+  // Example: "shrizz999-my-portfolio.hf.space"
+  // ======================================================================
+  const HUGGING_FACE_DOMAIN = "YOUR_HUGGING_FACE_URL_HERE.hf.space"; 
+
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({ video: true })
       .then((stream) => {
@@ -189,18 +194,31 @@ function OpenCVSection() {
           videoRef.current.play().catch(e => console.error(e));
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Camera access error:", err));
 
-    // Dynamic URL switching based on development vs production environment
-    // Make sure to replace <YOUR_HUGGINGFACE_SPACE_DOMAIN> with your actual HF domain!
-    const backendWsUrl = import.meta.env.MODE === 'development' 
+    const isLocalDev = import.meta.env.DEV;
+    const backendWsUrl = isLocalDev 
       ? 'ws://localhost:8000/ws/opencv' 
-      : 'wss://shrizz999-shrizzfolio.hf.space/ws/opencv'; 
+      : `wss://shrizz999-shrizzfolio.hf.space/ws/opencv`; 
+
+    console.log("Vite DEV Mode Active:", isLocalDev);
+    console.log("Attempting to connect to WebSocket:", backendWsUrl);
 
     wsRef.current = new WebSocket(backendWsUrl);
     
-    wsRef.current.onopen = () => setIsConnected(true);
-    wsRef.current.onclose = () => setIsConnected(false);
+    wsRef.current.onopen = () => {
+      console.log("WebSocket Connected!");
+      setIsConnected(true);
+    };
+    
+    wsRef.current.onclose = (event) => {
+      console.log("WebSocket Closed:", event);
+      setIsConnected(false);
+    };
+
+    wsRef.current.onerror = (error) => {
+      console.error("WebSocket Error:", error);
+    };
     
     wsRef.current.onmessage = (event) => {
       if (imgRef.current) imgRef.current.src = event.data;
