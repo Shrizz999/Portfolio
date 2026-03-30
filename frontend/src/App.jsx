@@ -105,7 +105,8 @@ function AIAgentSection() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://portfolio-myax.onrender.com/api/chat', {
+      // Switched to HTTPS to prevent mixed-content blocks on Vercel
+      const response = await fetch('https://portfolio-myax.onrender.com/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage }),
@@ -190,7 +191,13 @@ function OpenCVSection() {
       })
       .catch((err) => console.error(err));
 
-    wsRef.current = new WebSocket('ws://localhost:8000/ws/opencv');
+    // Dynamic URL switching based on development vs production environment
+    // Make sure to replace <YOUR_HUGGINGFACE_SPACE_DOMAIN> with your actual HF domain!
+    const backendWsUrl = import.meta.env.MODE === 'development' 
+      ? 'ws://localhost:8000/ws/opencv' 
+      : 'wss://https://shrizz999-shrizzfolio.hf.space/ws/opencv'; 
+
+    wsRef.current = new WebSocket(backendWsUrl);
     
     wsRef.current.onopen = () => setIsConnected(true);
     wsRef.current.onclose = () => setIsConnected(false);
@@ -248,7 +255,6 @@ function OpenCVSection() {
         <video ref={videoRef} autoPlay playsInline muted className="fixed top-[-100%] left-[-100%] opacity-0 pointer-events-none" />
         <canvas ref={canvasRef} width="640" height="480" className="fixed top-[-100%] left-[-100%] opacity-0 pointer-events-none" />
         
-        {/* Changed max width to 4xl to make the feed much larger */}
         <div className="bg-gray-50 p-4 rounded-[32px] shadow-sm border-2 border-blue-100 w-full max-w-4xl">
            <div className="flex justify-between items-center mb-3 px-4">
              <span className={`px-3 py-1 rounded-full text-xs font-bold ${isConnected ? 'bg-pastel-green text-green-800' : 'bg-pastel-pink text-red-800'}`}>
@@ -257,7 +263,6 @@ function OpenCVSection() {
              <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
            </div>
            
-           {/* Changed from aspect-video to aspect-[4/3] to stop cropping */}
            <div className="aspect-[4/3] bg-gray-200 rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
              <img ref={imgRef} className="w-full h-full object-cover z-10" alt="CV Stream" />
            </div>
