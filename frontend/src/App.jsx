@@ -195,7 +195,7 @@ function OpenCVSection() {
     // Make sure to replace <YOUR_HUGGINGFACE_SPACE_DOMAIN> with your actual HF domain!
     const backendWsUrl = import.meta.env.MODE === 'development' 
       ? 'ws://localhost:8000/ws/opencv' 
-      : 'wss://https://shrizz999-shrizzfolio.hf.space/ws/opencv'; 
+      : 'wss://shrizz999-shrizzfolio.hf.space/ws/opencv'; 
 
     wsRef.current = new WebSocket(backendWsUrl);
     
