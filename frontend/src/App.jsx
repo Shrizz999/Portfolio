@@ -184,7 +184,7 @@ function OpenCVSection() {
   // EDIT THE LINE BELOW! Replace the string with your Hugging Face Domain
   // Example: "shrizz999-my-portfolio.hf.space"
   // ======================================================================
-  const HUGGING_FACE_DOMAIN = "YOUR_HUGGING_FACE_URL_HERE.hf.space"; 
+  const HUGGING_FACE_DOMAIN = "shrizz999-shrizzfolio.hf.space"; 
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({ video: true })
@@ -197,9 +197,11 @@ function OpenCVSection() {
       .catch((err) => console.error("Camera access error:", err));
 
     const isLocalDev = import.meta.env.DEV;
+    const cleanDomain = HUGGING_FACE_DOMAIN.replace(/^https?:\/\//, '');
+    
     const backendWsUrl = isLocalDev 
       ? 'ws://localhost:8000/ws/opencv' 
-      : `wss://shrizz999-shrizzfolio.hf.space/ws/opencv`; 
+      : `wss://${cleanDomain}/ws/opencv`; 
 
     console.log("Vite DEV Mode Active:", isLocalDev);
     console.log("Attempting to connect to WebSocket:", backendWsUrl);
