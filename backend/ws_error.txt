@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Programming\Hub\backend\main.py", line 273, in cv_stream
+    fatigue_detector = MediaPipeEyeFatigueDetector()
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Programming\Hub\backend\main.py", line 71, in __init__
+    self.mp_face_mesh = mp.solutions.face_mesh
+                        ^^^^^^^^^^^^
+AttributeError: module 'mediapipe' has no attribute 'solutions'

@@ -21,10 +21,15 @@ load_dotenv()
 app = FastAPI(title="Portfolio ML Engine")
 app.include_router(ml_routes.router, prefix="/api")
 
+@app.on_event("startup")
+async def dump_routes():
+    with open("routes_dump.txt", "w") as f:
+        for route in app.routes:
+            f.write(f"{getattr(route, 'path', str(route))}\n")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
-    allow_credentials=True,
+    allow_origins=["https://shrizzfolio.vercel.app", "http://localhost:5173", "http://127.0.0.1:5173"], 
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -261,11 +266,13 @@ class HandPuzzleGame:
 @app.websocket("/ws/opencv")
 async def cv_stream(websocket: WebSocket):
     await websocket.accept()
-    
-    fatigue_detector = MediaPipeEyeFatigueDetector()
-    puzzle_game = HandPuzzleGame()
+    with open("ws_connect.txt", "w") as f:
+        f.write("CONNECTED")
     
     try:
+        fatigue_detector = MediaPipeEyeFatigueDetector()
+        puzzle_game = HandPuzzleGame()
+        
         while True:
             data = await websocket.receive_text()
             payload = json.loads(data)
@@ -292,7 +299,14 @@ async def cv_stream(websocket: WebSocket):
             await websocket.send_text(f"data:image/jpeg;base64,{processed_base64}")
             
     except Exception as e:
-        print(f"WebSocket closed: {e}")
+        print(f"WebSocket exception: {e}")
+        try:
+            import traceback
+            err_msg = traceback.format_exc()
+            with open("ws_error.txt", "w") as f:
+                f.write(err_msg)
+        except:
+            pass
     finally:
         await websocket.close()
 

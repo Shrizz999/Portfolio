@@ -3,7 +3,7 @@ uvicorn[standard]
 websockets
 opencv-python-headless
 numpy
-mediapipe
+mediapipe==0.10.14
 google-generativeai
 python-dotenv
 scikit-learn

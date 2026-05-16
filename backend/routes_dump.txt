@@ -1,0 +1,7 @@
+/openapi.json
+/docs
+/docs/oauth2-redirect
+/redoc
+/api/predict/lung-cancer
+/api/chat
+/ws/opencv

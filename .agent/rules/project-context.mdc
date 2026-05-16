@@ -1,0 +1,37 @@
+# AI & ML Hub - Master Project Context
+
+## 1. Core Development Philosophy
+* **One Feature Rule:** We build, test, and deploy one single deliverable to production before starting the next. No half-finished features.
+* **Code Delivery:** Provide complete, full code blocks with exact file paths. Never use placeholders like `// ... rest of the code`. 
+* **Environment:** Development occurs on an ASUS TUF laptop running Windows 11. All terminal/shell commands must be PowerShell or CMD friendly.
+
+## 2. Project Architecture & Folder Structure
+Our project is split into two completely isolated environments:
+
+* **Frontend:** `C:\Programming\Hub\frontend`
+  * *Tech:* React (Vite), TailwindCSS.
+  * *Deployment:* Vercel (`https://shrizzfolio.vercel.app`).
+* **Backend:** `C:\Programming\Hub\backend`
+  * *Tech:* Python 3.11, FastAPI, scikit-learn, OpenCV (`opencv-python-headless`).
+  * *Deployment:* Hugging Face Spaces (`https://shrizz999-shrizzfolio.hf.space`).
+  * *CI/CD:* GitHub Actions automatically isolates the `backend/` folder, applies Git LFS to `*.pkl` files, and force-pushes to the Hugging Face main branch.
+
+## 3. Deployment Constraints (The Cloud Rules)
+* **The Localhost Trap:** The FastAPI backend is in the cloud. It cannot access local laptop hardware. Never suggest code that uses `cv2.VideoCapture(0)` on the backend.
+* **CORS Policy:** The FastAPI `main.py` must explicitly allow our Vercel domain (`https://shrizzfolio.vercel.app`) in the `CORSMiddleware`.
+* **Git LFS:** Any new Machine Learning models (`.pkl`, `.h5`) added to the backend must be tracked via Git LFS in the GitHub Action workflow, otherwise Hugging Face will reject the push.
+
+## 4. Standard ML Workflow (REST APIs)
+When adding a standard predictive model (e.g., Lung Cancer Prediction):
+1. **Backend:** Load the `.pkl` file via `joblib`, create a Pydantic BaseModel for incoming JSON data, and expose a `POST` route in `ml_routes.py`.
+2. **Frontend:** Use standard HTTP `fetch()` pointing to `https://shrizz999-shrizzfolio.hf.space/api/predict/...`.
+
+## 5. Live Computer Vision Workflow (WebSockets)
+When adding real-time video processing (e.g., Edge Detection, Fatigue Monitoring):
+1. **Architecture:** Standard `fetch` is forbidden for live video. We use **WebSockets** (`wss://`).
+2. **Frontend:** React requests webcam permission, draws frames to a hidden `<canvas>`, compresses them to JPEG (base64), and streams them via `ws.send()`.
+3. **Backend:** The FastAPI route (in `cv_routes.py`) receives the base64 string, decodes it into a NumPy array, applies OpenCV processing headlessly, encodes it back to base64, and sends it instantly back to the client.
+
+## 6. Debugging Protocol
+* If the React frontend fails to connect to the backend, the AI must immediately check for CORS errors or HTTP vs HTTPS mismatches before assuming a code logic error.
+* If a Computer Vision WebSocket disconnects, the AI must ensure the frontend is using `wss://` and not `https://`.
